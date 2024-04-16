@@ -1,0 +1,275 @@
+Assignment 4(AJAX)
+Set A
+Q1. Write AJAX program to read contact.dat file and print the contents of the
+file in a tabular format when the user clicks on print button. Contact.dat file
+should contain srno, name, residence number, mobile number, Address. [Enter
+at least 3 record in contact.dat file]
+AnsAs4sa1.html
+<html>
+<head>
+<style>
+span
+{
+font-size: 25px;
+}
+table
+{
+color: blueviolet; ;
+}
+</style>
+<script type="text/javascript" >
+function print()
+{
+var ob=false;
+ob=new XMLHttpRequest();
+ob.open("GET","as4sa1.php?");//emailid="+eid);
+ob.send();
+ob.onreadystatechange=function()
+{
+if(ob.readyState==4 && ob.status==200)
+{
+document.getElementById("i").innerHTML=ob.responseText;
+}
+}
+}
+</script>
+</head>
+<body>
+<center>
+<h3>Display the contents of a contact.dat file </h3>
+<br><input type="button" value=Print onclick="print()" >
+<span id="i"></span>
+</center>
+</body>
+</html>
+As4sa1.php
+<?php
+$fp = fopen('contact.dat','r');
+echo "<table border=1>";
+echo "<tr><th>Sr. No.</th><th>Name</th><th>Residence No.</th><th>Mob.
+no.</th><th>Relation</th></tr>";
+while($row = fscanf($fp,"%s %s %s %s %s"))
+{
+echo "<tr>";
+foreach($row as $r)
+{
+echo "<td>$r</td>";
+}
+echo "</tr>";
+}
+echo "</table>";
+fclose($fp);
+?>
+Contact.dat
+1 Isha 65768798 98765432 Daughter
+2 Megha 65235689 87654329 Mother
+Q 2. Write AJAX program where the user is requested to write his or her name
+in a text box, and the server keeps sending back responses while the user is
+typing. If the user name is not entered then the message displayed will be,
+“Stranger, please tell me your name!”. If the name is Rohit, Virat, Dhoni,
+Ashwin or Harbhajan , the server responds with “Hello, master !”. If the name is
+anything else, the message will be “, I don’t know you!”.
+Ans-
+as4sa2.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AJAX Name Checker</title>
+<script
+src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+<h3>AJAX Name Checker</h3>
+<input type="text" id="nameInput" placeholder="Enter your name...">
+<p id="response"></p>
+<script>
+$(document).ready(function(){
+$('#nameInput').keyup(function(){
+var name = $(this).val();
+$.ajax({
+url: 'as4sa2.php',
+type: 'POST',
+data: {name: name},
+success: function(data){
+$('#response').html(data);
+}
+});
+});
+});
+</script>
+</body>
+</html>
+as4sa2.php
+<?php
+$name = $_POST['name'];
+if(empty($name))
+{
+echo "Stranger, please tell me your name!";
+}
+elseif($name == 'Rohit' || $name == 'Virat' || $name == 'Dhoni' || $name ==
+'Ashwin' || $name == 'Harbhajan')
+{
+echo "Hello, master $name!";
+}
+else
+{
+echo "$name, I don't know you.";
+}
+?>
+Set B
+Q 1.Create TEACHER table as follows TEACHER(tno, tname, qualification,
+salary). Write Ajax program to select a teachers name and print the selected
+teachers details.
+AnsAs4sb2.html
+<html>
+<head>
+<script type="text/javascript">
+function get_teacher(tname)
+{
+var ob=false;
+ob=new XMLHttpRequest();
+ob.onreadystatechange=function()
+{
+if(ob.readyState==4 && ob.status==200)
+document.getElementById("place").innerHTML=ob.responseText;
+}
+ob.open("GET","database.php?tname="+tname,true);
+ob.send();
+}
+</script>
+</head>
+<body>
+Select Name Of Teacher :
+<select name="tname" onchange="get_teacher(this.value)">
+<option value="">select teacher</option>
+<option value="Nikita">Nikita</option>
+<option value="Snehal">Snehal</option>
+<option value="Faizal">Faizal</option>
+</select>
+<div id="place"></div>
+</body>
+</html>
+As4sb2.php
+<?php
+$tname=$_GET['tname'];
+$con=mysql_connect("localhost","root","");
+$d=mysql_select_db("college",$con);
+$q=mysql_query("select * from teacher where tname='$tname'");
+echo "<table border=1>";
+echo
+"<tr><th>Tno</th><th>Tname</th><th>Qualification</th><th>salary</th></tr
+>";
+while($row=mysql_fetch_array($q))
+{
+echo "<tr>";
+echo "<td>".$row[0]."</td>";
+echo "<td>".$row[1]."</td>";
+echo "<td>".$row[2]."</td>";
+echo "<td>".$row[3]."</td>";
+echo "</tr>";
+}
+echo "</table>";
+?>
+Database
+Create database college
+Create table teacher(tno int primary key,tname varchar(20),qualification
+varchar(10),salary int);
+Insert 3 records
+Q 2. Write Ajax program to print Order details by selecting a Customer’s name.
+Create table Customer and Order as follows with 1 : M cardinality CUSTOMER
+(cno, cname, city) and ORDER(ono, odate, shipping address)
+Set C
+Q 1. Write Ajax program to fetch suggestions when is user is typing in a
+textbox. (eg like google suggestions. Hint create array of suggestions and
+matching string will be displayed)
+AnsAs4sc1.html
+<html>
+<head>
+<script type="text/javascript">
+function suggest()
+{
+var arr = ["apple","banana","mango","orange","strawberry","grapes"];
+var suggest = "";
+var input = document.getElementById("txt1").value;
+for(i=0;i<arr.length;i++)
+{
+if(arr[i].substring(0,input.length).toLowerCase() == input.toLowerCase()) {
+suggest = suggest+" "+arr[i];
+}
+}
+document.getElementById("txt2").innerHTML = suggest;
+}
+</script>
+</head>
+<body>
+<input type="text" id="txt1" onkeyup="suggest();">
+<p>Suggestions: <span id="txt2">
+</span>
+</p>
+</body>
+</html>
+Q 2. Write Ajax program to get book details from XML file when user select a
+book name. Create XML file for storing details of book(title, author, year,
+price).
+AnsAs4sc2.html
+<!DOCTYPE html>
+<html>
+<head>
+<title>Book Details</title>
+<script
+src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+<label for="books">Select a book:</label>
+<select id="books">
+<option value="Book 1">Book 1</option>
+<option value="Book 2">Book 2</option>
+</select>
+<br>
+<div id="bookDetails"></div>
+<script>
+$('#books').change(function() {
+var selectedBook = $(this).val();
+$.ajax({
+type: 'GET',
+url: 'as4sc2.xml',
+dataType: 'xml',
+success: function(xml) {
+$(xml).find('book').each(function() {
+var title = $(this).find('title').text();
+var author = $(this).find('author').text();
+var genre = $(this).find('genre').text();
+var price = $(this).find('price').text();
+if (title === selectedBook) {
+$('#bookDetails').html('<b>Title:</b> ' + title + '<br><b>Author:</b> ' + author
++ '<br><b>Genre:
+</b> ' + genre + '<br><b>Price:</b> ' + price);
+}
+});
+},
+error: function() {
+alert('Error loading book details.');
+}
+});
+});
+</script>
+</body>
+</html>
+As4sc2.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<books>
+<book>
+<title>Book 1</title>
+<author>Author 1</author>
+<genre>Genre 1</genre>
+<price>$10.00</price>
+</book>
+<book>
+<title>Book 2</title>
+<author>Author 2</author>
+<genre>Genre 2</genre>
+<price>$15.00</price>
+</book>
+</books>
